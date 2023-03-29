@@ -7,6 +7,7 @@ import 'package:flutter_signin_button/flutter_signin_button.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'problem_statement.dart';
 import 'grid_with_gestures.dart';
+import 'calculator.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -91,10 +92,11 @@ class _MainAppState extends State<MainApp> {
     // ******* INSERT FIRESTORE CODE HERE https://firebase.google.com/docs/firestore/quickstart#dart
 
     //db.collection(_uid).add({"author_uid": _uid,"test": 1});
-    db
-        .collection('listtest')
-        .doc(_uid)
-        .set({"author_uid": _uid, "author_name": 'mrkaosha', 'test': FieldValue.serverTimestamp()});
+    db.collection('listtest').doc(_uid).set({
+      "author_uid": _uid,
+      "author_name": 'mrkaosha',
+      'test': FieldValue.serverTimestamp()
+    });
 
     db.collection('listtest').get().then(
       (querySnapshot) {
@@ -130,15 +132,7 @@ class _MainAppState extends State<MainApp> {
             Align(
               child: ProblemStatement(currentParams: currentParams),
             ),
-            Align(
-              child: GridWithGestureDetector(
-                canvasWidth: canvasWidth,
-                margins: margins,
-                canvasHeight: canvasHeight,
-                gridSize: gridSize,
-                dataList: dataList,
-              ),
-            ),
+            MyCalculator(),
             Align(
               child: ActionButtons(
                 checkAnswer: checkAnswer,
