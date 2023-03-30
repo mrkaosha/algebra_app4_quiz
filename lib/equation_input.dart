@@ -3,6 +3,7 @@ library equation_input;
 import 'package:flutter/material.dart';
 import 'buttons.dart';
 import 'package:math_expressions/math_expressions.dart';
+import 'package:catex/catex.dart';
 
 class MyEquationInput extends StatefulWidget {
   MyEquationInput() {
@@ -21,7 +22,7 @@ class MyEquationInputState extends State<MyEquationInput> {
   final List<String> buttons = [
     'C',
     'DEL',
-    'y = ',
+    'y =',
     'x',
     '+',
     '-',
@@ -51,24 +52,14 @@ class MyEquationInputState extends State<MyEquationInput> {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: <Widget>[
                 Container(
-                  padding: EdgeInsets.all(20),
-                  alignment: Alignment.centerRight,
-                  child: Text(
-                    userInput,
-                    style: TextStyle(fontSize: 18, color: Colors.black),
-                  ),
-                ),
-                Container(
-                  padding: EdgeInsets.all(15),
-                  alignment: Alignment.centerRight,
-                  child: Text(
-                    answer,
-                    style: const TextStyle(
-                        fontSize: 30,
-                        color: Colors.black,
-                        fontWeight: FontWeight.bold),
-                  ),
-                )
+                    padding: EdgeInsets.all(15),
+                    alignment: Alignment.centerLeft,
+                    child: DefaultTextStyle.merge(
+                      style: TextStyle(
+                        fontSize: 24,
+                      ),
+                      child: CaTeX(userInput == '' ? r'\text{ }' : userInput + r'\text{ }'),
+                    ))
               ]),
           GridView.builder(
               physics: const NeverScrollableScrollPhysics(),
@@ -82,8 +73,8 @@ class MyEquationInputState extends State<MyEquationInput> {
                   return MyButton(
                     buttontapped: () {
                       setState(() {
-                        userInput = '';
-                        answer = '0';
+                        userInput = 'r';
+                        answer = '';
                       });
                     },
                     buttonText: buttons[index],
@@ -92,7 +83,7 @@ class MyEquationInputState extends State<MyEquationInput> {
                   );
                 }
 
-                // % Button
+                // y= Button
                 else if (index == 2 || index == 3) {
                   return MyButton(
                     buttontapped: () {
@@ -110,8 +101,21 @@ class MyEquationInputState extends State<MyEquationInput> {
                   return MyButton(
                     buttontapped: () {
                       setState(() {
-                        userInput =
-                            userInput.substring(0, userInput.length - 1);
+                        if (userInput == '' ||
+                            userInput.length == 1 ||
+                            userInput == 'y =') {
+                          userInput = '';
+                          return;
+                        }
+                        if (userInput.substring(
+                                userInput.length - 2, userInput.length - 1) ==
+                            ' ') {
+                          userInput =
+                              userInput.substring(0, userInput.length - 2);
+                        } else {
+                          userInput =
+                              userInput.substring(0, userInput.length - 1);
+                        }
                       });
                     },
                     buttonText: buttons[index],
@@ -119,26 +123,14 @@ class MyEquationInputState extends State<MyEquationInput> {
                     textColor: Colors.black,
                   );
                 }
-                // Equal_to Button
-                else if (index == 18) {
-                  return MyButton(
-                    buttontapped: () {
-                      setState(() {
-                        equalPressed();
-                      });
-                    },
-                    buttonText: buttons[index],
-                    color: Colors.orange[700],
-                    textColor: Colors.white,
-                  );
-                }
-
                 // other buttons
                 else {
                   return MyButton(
                     buttontapped: () {
                       setState(() {
-                        userInput += buttons[index];
+                        userInput += isOperator(buttons[index])
+                            ? " ${buttons[index]} "
+                            : buttons[index];
                       });
                     },
                     buttonText: buttons[index],
@@ -157,7 +149,7 @@ class MyEquationInputState extends State<MyEquationInput> {
   }
 
   bool isOperator(String x) {
-    if (x == '/' || x == 'x' || x == '-' || x == '+' || x == '=') {
+    if (x == '-' || x == '+' || x == '=') {
       return true;
     }
     return false;

@@ -2,6 +2,11 @@
 
 A new Flutter project.
 
+## Todo
+
+- Create a problem generator for graphing point and slope
+- Switch to CaTeX rendering of equations
+
 ## Getting Started
 
 This project is a starting point for a Flutter application.
