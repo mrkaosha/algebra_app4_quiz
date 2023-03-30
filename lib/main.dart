@@ -1,4 +1,5 @@
 import 'package:algebra_app4_quiz/calculate_slope.dart';
+import 'package:algebra_app4_quiz/equation_input.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
@@ -132,7 +133,7 @@ class _MainAppState extends State<MainApp> {
             Align(
               child: ProblemStatement(currentParams: currentParams),
             ),
-            MyCalculator(),
+            MyEquationInput(),
             Align(
               child: ActionButtons(
                 checkAnswer: checkAnswer,
