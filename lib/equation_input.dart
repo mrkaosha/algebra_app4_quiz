@@ -22,7 +22,7 @@ class MyEquationInputState extends State<MyEquationInput> {
   final List<String> buttons = [
     'C',
     'DEL',
-    'y =',
+    'y= ',
     'x',
     '+',
     '-',
@@ -37,7 +37,10 @@ class MyEquationInputState extends State<MyEquationInput> {
     '8',
     '9',
     '0',
+    '*',
   ];
+
+  final re = RegExp(r'(-)|( )');
 
   @override
   Widget build(BuildContext context) {
@@ -51,15 +54,18 @@ class MyEquationInputState extends State<MyEquationInput> {
           Column(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: <Widget>[
-                Container(
-                    padding: EdgeInsets.all(15),
-                    alignment: Alignment.centerLeft,
-                    child: DefaultTextStyle.merge(
-                      style: TextStyle(
-                        fontSize: 24,
-                      ),
-                      child: CaTeX(userInput == '' ? r'\text{ }' : userInput + r'\text{ }'),
-                    ))
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Container(
+                      padding: const EdgeInsets.all(15),
+                      alignment: Alignment.centerLeft,
+                      child: DefaultTextStyle.merge(
+                        style: const TextStyle(
+                          fontSize: 24,
+                        ),
+                        child: CaTeX(userInput == '' ? r'\text{ }' : userInput + r'\text{ }'),
+                      )),
+                )
               ]),
           GridView.builder(
               physics: const NeverScrollableScrollPhysics(),
@@ -73,7 +79,7 @@ class MyEquationInputState extends State<MyEquationInput> {
                   return MyButton(
                     buttontapped: () {
                       setState(() {
-                        userInput = 'r';
+                        userInput = '';
                         answer = '';
                       });
                     },
@@ -103,13 +109,13 @@ class MyEquationInputState extends State<MyEquationInput> {
                       setState(() {
                         if (userInput == '' ||
                             userInput.length == 1 ||
-                            userInput == 'y =') {
+                            userInput == 'y=' ||
+                            userInput == 'y= ') {
                           userInput = '';
                           return;
                         }
-                        if (userInput.substring(
-                                userInput.length - 2, userInput.length - 1) ==
-                            ' ') {
+                        if (re.hasMatch(userInput.substring(
+                                userInput.length - 2, userInput.length - 1))) {
                           userInput =
                               userInput.substring(0, userInput.length - 2);
                         } else {
@@ -123,7 +129,7 @@ class MyEquationInputState extends State<MyEquationInput> {
                     textColor: Colors.black,
                   );
                 }
-                // other buttons
+                // other buttons (there is a hack to check for operator)
                 else {
                   return MyButton(
                     buttontapped: () {
@@ -149,7 +155,7 @@ class MyEquationInputState extends State<MyEquationInput> {
   }
 
   bool isOperator(String x) {
-    if (x == '-' || x == '+' || x == '=') {
+    if (x == '-' || x == '+' || x == '/' || x == '*') {
       return true;
     }
     return false;
