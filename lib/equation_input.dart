@@ -40,7 +40,7 @@ class MyEquationInputState extends State<MyEquationInput> {
     '*',
   ];
 
-  final re = RegExp(r'(-)|( )');
+  final re = RegExp(r'([-+*])|( )');
 
   @override
   Widget build(BuildContext context) {
@@ -63,7 +63,9 @@ class MyEquationInputState extends State<MyEquationInput> {
                         style: const TextStyle(
                           fontSize: 24,
                         ),
-                        child: CaTeX(userInput == '' ? r'\text{ }' : userInput + r'\text{ }'),
+                        child: CaTeX(userInput == ''
+                            ? r'\text{ }'
+                            : userInput + r'\text{ }'),
                       )),
                 )
               ]),
@@ -90,11 +92,25 @@ class MyEquationInputState extends State<MyEquationInput> {
                 }
 
                 // y= Button
-                else if (index == 2 || index == 3) {
+                else if (index == 2) {
                   return MyButton(
                     buttontapped: () {
                       setState(() {
                         userInput += buttons[index];
+                      });
+                    },
+                    buttonText: buttons[index],
+                    color: Colors.blue[50],
+                    textColor: Colors.black,
+                  );
+                }
+
+                // x button
+                else if (index == 3) {
+                  return MyButton(
+                    buttontapped: () {
+                      setState(() {
+                        userInput += ' ${buttons[index]}';
                       });
                     },
                     buttonText: buttons[index],
@@ -115,7 +131,7 @@ class MyEquationInputState extends State<MyEquationInput> {
                           return;
                         }
                         if (re.hasMatch(userInput.substring(
-                                userInput.length - 2, userInput.length - 1))) {
+                            userInput.length - 2, userInput.length - 1))) {
                           userInput =
                               userInput.substring(0, userInput.length - 2);
                         } else {
