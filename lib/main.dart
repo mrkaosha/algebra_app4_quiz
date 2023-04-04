@@ -66,33 +66,8 @@ class _MainAppState extends State<MainApp> {
   }
 
   bool checkAnswer() {
-    bool correct = true;
-    int numPoints = 0;
-    double offset =
-        -10.0; // ****should I put this offset in the class global variables?****
-    for (int i = 0; i <= (canvasHeight / gridSize as int); i++) {
-      // grab the dots for the data points
-      var r = dataList[i];
-      r.asMap().forEach((index, d) {
-        if (d) {
-          numPoints++;
-          print((i + offset) * currentParams['den']);
-          print(currentParams['num'] * (index + offset) +
-              currentParams['yint'] * currentParams['den']);
-        }
-        if (d &&
-            ((i + offset) * currentParams['den'] !=
-                currentParams['num'] * (index + offset) +
-                    currentParams['yint'] * currentParams['den'])) {
-          correct = false;
-        }
-      });
-    }
-    print(correct && numPoints > 1);
 
-    // ******* INSERT FIRESTORE CODE HERE https://firebase.google.com/docs/firestore/quickstart#dart
 
-    //db.collection(_uid).add({"author_uid": _uid,"test": 1});
     db.collection('listtest').doc(_uid).set({
       "author_uid": _uid,
       "author_name": 'mrkaosha',
@@ -108,8 +83,7 @@ class _MainAppState extends State<MainApp> {
       },
       onError: (e) => print("Error completing: $e"),
     );
-
-    return (correct && numPoints > 1);
+    return false;
   }
 
   void updateUser(String uid) {

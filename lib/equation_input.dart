@@ -16,7 +16,9 @@ class MyEquationInput extends StatefulWidget {
 
 class MyEquationInputState extends State<MyEquationInput> {
   var userInput = '';
+  var uiEqn = '';
   var answer = '';
+  bool operatorFlag = false;
 
 // Array of button
   final List<String> buttons = [
@@ -42,9 +44,26 @@ class MyEquationInputState extends State<MyEquationInput> {
 
   final re = RegExp(r'([-+*])|( )');
 
+  void createUIEqn() {
+    List<String> splitString = userInput.split(' ');
+    splitString.asMap().forEach((index, element) {
+      if (index == splitString.length - 1) {
+        return;
+      }
+      if (element.contains('/')) {
+        splitString[index - 1] = '\\frac\{${splitString[index - 1]}\}';
+        splitString[index + 1] = '\{${splitString[index + 1]}\}';
+        splitString[index] = '';
+      }
+    });
+    uiEqn = splitString.join();
+    print(uiEqn);
+  }
+
   @override
   Widget build(BuildContext context) {
     print(userInput);
+    createUIEqn();
     return Padding(
       padding: EdgeInsetsDirectional.symmetric(
           horizontal: MediaQuery.of(context).size.width / 4),
@@ -65,7 +84,7 @@ class MyEquationInputState extends State<MyEquationInput> {
                         ),
                         child: CaTeX(userInput == ''
                             ? r'\text{ }'
-                            : userInput + r'\text{ }'),
+                            : uiEqn + r'\text{ }'),
                       )),
                 )
               ]),
@@ -97,6 +116,7 @@ class MyEquationInputState extends State<MyEquationInput> {
                     buttontapped: () {
                       setState(() {
                         userInput += buttons[index];
+                        operatorFlag = true;
                       });
                     },
                     buttonText: buttons[index],
@@ -145,14 +165,39 @@ class MyEquationInputState extends State<MyEquationInput> {
                     textColor: Colors.black,
                   );
                 }
+                // - button
+                else if (index == 5) {
+                  return MyButton(
+                    buttontapped: () {
+                      if (operatorFlag) {
+                        setState(() {
+                          userInput += buttons[index];
+                          operatorFlag = false;
+                        });
+                      } else {
+                        setState(() {
+                          userInput += ' ${buttons[index]} ';
+                          operatorFlag = true;
+                        });
+                      }
+                    },
+                    buttonText: buttons[index],
+                    color: Colors.blueAccent,
+                    textColor: Colors.white,
+                  );
+                }
                 // other buttons (there is a hack to check for operator)
                 else {
                   return MyButton(
                     buttontapped: () {
                       setState(() {
-                        userInput += isOperator(buttons[index])
-                            ? " ${buttons[index]} "
-                            : buttons[index];
+                        if(isOperator(buttons[index])) {
+                            userInput += " ${buttons[index]} ";
+                            operatorFlag = true;
+                        } else {
+                          userInput += buttons[index];
+                          operatorFlag = false;
+                        }
                       });
                     },
                     buttonText: buttons[index],
