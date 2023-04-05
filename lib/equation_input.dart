@@ -6,10 +6,10 @@ import 'package:math_expressions/math_expressions.dart';
 import 'package:catex/catex.dart';
 
 class MyEquationInput extends StatefulWidget {
-  MyEquationInput() {
-    key:
-    super.key;
-  }
+  MyEquationInput({super.key, required this.updateUserEquation}) {}
+
+  final updateUserEquation;
+
   @override
   MyEquationInputState createState() => MyEquationInputState();
 }
@@ -62,8 +62,8 @@ class MyEquationInputState extends State<MyEquationInput> {
 
   @override
   Widget build(BuildContext context) {
-    print(userInput);
     createUIEqn();
+
     return Padding(
       padding: EdgeInsetsDirectional.symmetric(
           horizontal: MediaQuery.of(context).size.width / 4),
@@ -102,6 +102,7 @@ class MyEquationInputState extends State<MyEquationInput> {
                       setState(() {
                         userInput = '';
                         answer = '';
+                        widget.updateUserEquation(userInput);
                       });
                     },
                     buttonText: buttons[index],
@@ -117,6 +118,7 @@ class MyEquationInputState extends State<MyEquationInput> {
                       setState(() {
                         userInput += buttons[index];
                         operatorFlag = true;
+                        widget.updateUserEquation(userInput);
                       });
                     },
                     buttonText: buttons[index],
@@ -131,6 +133,7 @@ class MyEquationInputState extends State<MyEquationInput> {
                     buttontapped: () {
                       setState(() {
                         userInput += ' ${buttons[index]}';
+                        widget.updateUserEquation(userInput);
                       });
                     },
                     buttonText: buttons[index],
@@ -148,15 +151,18 @@ class MyEquationInputState extends State<MyEquationInput> {
                             userInput == 'y=' ||
                             userInput == 'y= ') {
                           userInput = '';
+                          widget.updateUserEquation(userInput);
                           return;
                         }
                         if (re.hasMatch(userInput.substring(
                             userInput.length - 2, userInput.length - 1))) {
                           userInput =
                               userInput.substring(0, userInput.length - 2);
+                          widget.updateUserEquation(userInput);
                         } else {
                           userInput =
                               userInput.substring(0, userInput.length - 1);
+                          widget.updateUserEquation(userInput);
                         }
                       });
                     },
@@ -173,11 +179,13 @@ class MyEquationInputState extends State<MyEquationInput> {
                         setState(() {
                           userInput += buttons[index];
                           operatorFlag = false;
+                          widget.updateUserEquation(userInput);
                         });
                       } else {
                         setState(() {
                           userInput += ' ${buttons[index]} ';
                           operatorFlag = true;
+                          widget.updateUserEquation(userInput);
                         });
                       }
                     },
@@ -191,11 +199,13 @@ class MyEquationInputState extends State<MyEquationInput> {
                   return MyButton(
                     buttontapped: () {
                       setState(() {
-                        if(isOperator(buttons[index])) {
-                            userInput += " ${buttons[index]} ";
-                            operatorFlag = true;
+                        if (isOperator(buttons[index])) {
+                          userInput += " ${buttons[index]} ";
+                          widget.updateUserEquation(userInput);
+                          operatorFlag = true;
                         } else {
                           userInput += buttons[index];
+                          widget.updateUserEquation(userInput);
                           operatorFlag = false;
                         }
                       });

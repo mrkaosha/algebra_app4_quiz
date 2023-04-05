@@ -6,6 +6,7 @@ import 'firebase_options.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_signin_button/flutter_signin_button.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'action_buttons.dart';
 import 'problem_statement.dart';
 import 'grid_with_gestures.dart';
 import 'calculator.dart';
@@ -34,8 +35,9 @@ class _MainAppState extends State<MainApp> {
   double margins = 0.05; //the margin size as a percent of canvasWidth
   CalculateSlope params = CalculateSlope();
   Map<String, dynamic> currentParams = {};
+  String _userInput = "";
   bool drawCursor = false;
-  bool tapUp = true;
+
   FirebaseFirestore db = FirebaseFirestore.instance;
   String _uid = "";
 
@@ -84,6 +86,10 @@ class _MainAppState extends State<MainApp> {
     return false;
   }
 
+  void updateUserEquation(String userInput) {
+    setState(() => {_userInput = userInput});
+  }
+
   void updateUser(String uid) {
     _uid = uid;
     print(_uid);
@@ -91,6 +97,7 @@ class _MainAppState extends State<MainApp> {
 
   @override
   Widget build(BuildContext context) {
+    print(_userInput);
     var theme = Theme.of(context);
 
     return MaterialApp(
@@ -105,7 +112,9 @@ class _MainAppState extends State<MainApp> {
             Align(
               child: ProblemStatement(currentParams: currentParams),
             ),
-            MyEquationInput(),
+            MyEquationInput(
+              updateUserEquation: updateUserEquation,
+            ),
             Align(
               child: ActionButtons(
                 checkAnswer: checkAnswer,
@@ -210,52 +219,6 @@ class _LoginButtonState extends State<LoginButton> {
               Buttons.GoogleDark,
               onPressed: signInWithGoogle,
             ),
-    );
-  }
-}
-
-class ActionButtons extends StatelessWidget {
-  final dynamic checkAnswer;
-  final dynamic nextEquation;
-  final dynamic currentParams;
-  const ActionButtons(
-      {required this.checkAnswer,
-      required this.nextEquation,
-      required this.currentParams,
-      super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: <Widget>[
-        TextButton(
-          onPressed: () {
-            bool correct = checkAnswer();
-            showDialog<String>(
-              context: context,
-              builder: (BuildContext context) => AlertDialog(
-                content: Text(correct
-                    ? "Correct!"
-                    : "Incorrect, make sure your slope is ${currentParams['num']}/${currentParams['den']} or ${currentParams['num'] * -1}/${currentParams['den'] * -1} or a reduced fraction form of either"),
-                actions: <Widget>[
-                  TextButton(
-                    onPressed: () => Navigator.pop(context),
-                    child: const Text("Close"),
-                  ),
-                ],
-              ),
-            );
-          },
-          child: const Text("Check Answer"),
-        ),
-        TextButton(
-          onPressed: () {
-            nextEquation();
-          },
-          child: const Text("Next Equation"),
-        ),
-      ],
     );
   }
 }
