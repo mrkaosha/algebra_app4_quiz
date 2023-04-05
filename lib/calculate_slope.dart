@@ -331791,11 +331791,13 @@ class CalculateSlope {
 
   CalculateSlope() {
     for (int i = 0; i < num.length; i++) {
-      parameters.add({'num': num[i], 'den': den[i], 'x1': x1[i], 'y1': y1[i]});
+      if (num[i] * x1[i] % den[i] == 0)
+        parameters
+            .add({'num': num[i], 'den': den[i], 'x1': x1[i], 'y1': y1[i]});
     }
     parameters.shuffle();
   }
-  
+
   Map<String, dynamic> getNextParams() {
     if (currentEquation == parameters.length) {
       parameters.shuffle();

@@ -66,8 +66,6 @@ class _MainAppState extends State<MainApp> {
   }
 
   bool checkAnswer() {
-
-
     db.collection('listtest').doc(_uid).set({
       "author_uid": _uid,
       "author_name": 'mrkaosha',

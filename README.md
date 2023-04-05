@@ -6,6 +6,10 @@ A new Flutter project.
 
 - Create a problem generator for graphing point and slope
 - Switch to CaTeX rendering of equations
+(3-4)/(0-(-5))
+(-5,4) (0,3)
+
+(4,3) (8,-2)
 
 ## Getting Started
 
