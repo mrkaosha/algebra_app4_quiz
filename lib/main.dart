@@ -8,8 +8,9 @@ import 'package:flutter_signin_button/flutter_signin_button.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'action_buttons.dart';
 import 'problem_statement.dart';
-import 'grid_with_gestures.dart';
-import 'calculator.dart';
+import 'package:math_expressions/math_expressions.dart';
+//import 'grid_with_gestures.dart';
+//import 'calculator.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -35,11 +36,15 @@ class _MainAppState extends State<MainApp> {
   double margins = 0.05; //the margin size as a percent of canvasWidth
   CalculateSlope params = CalculateSlope();
   Map<String, dynamic> currentParams = {};
-  String _userInput = "";
+  List<String> _userInput = [];
   bool drawCursor = false;
+  Variable xVar = Variable('x');
+  Parser p = Parser();
+  late Expression exp;
 
   FirebaseFirestore db = FirebaseFirestore.instance;
-  String _uid = "";
+  String _uid = "guest";
+  String _username = "Guest";
 
   @override
   _MainAppState() {
@@ -70,7 +75,7 @@ class _MainAppState extends State<MainApp> {
   bool checkAnswer() {
     db.collection('listtest').doc(_uid).set({
       "author_uid": _uid,
-      "author_name": 'mrkaosha',
+      "author_name": _username,
       'test': FieldValue.serverTimestamp()
     });
 
@@ -86,12 +91,15 @@ class _MainAppState extends State<MainApp> {
     return false;
   }
 
-  void updateUserEquation(String userInput) {
+  void updateUserEquation(List<String> userInput) {
     setState(() => {_userInput = userInput});
   }
 
-  void updateUser(String uid) {
-    _uid = uid;
+  void updateUser(String uid, String username) {
+    setState(() {
+      _uid = uid;
+      _username = username;
+    });
     print(_uid);
   }
 
@@ -121,12 +129,6 @@ class _MainAppState extends State<MainApp> {
                 nextEquation: nextEquation,
                 currentParams: currentParams,
               ),
-            ),
-            TextButton(
-              onPressed: () {
-                setState(() => _resetDataList());
-              },
-              child: const Text("Clear graph"),
             ),
             const Padding(
               padding: EdgeInsets.only(bottom: 240.0),
@@ -173,10 +175,10 @@ class _LoginButtonState extends State<LoginButton> {
     FirebaseAuth.instance.authStateChanges().listen((User? user) {
       if (user != null) {
         print(user.uid);
-        widget.updateUid(user.uid);
         userName =
             user.email != null ? user.email!.split('@')[0] : 'Guest User';
         setState(() {
+          widget.updateUid(user.uid, userName);
           loggedIn = true;
         });
       }

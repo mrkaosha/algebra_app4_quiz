@@ -15,16 +15,16 @@ class MyEquationInput extends StatefulWidget {
 }
 
 class MyEquationInputState extends State<MyEquationInput> {
-  var userInput = '';
+  List<String> userInput = [' '];
   var uiEqn = '';
-  var answer = '';
-  bool operatorFlag = false;
+  bool allowX = true;
+  bool allowOperator = true;
 
 // Array of button
   final List<String> buttons = [
     'C',
     'DEL',
-    'y= ',
+    'y=',
     'x',
     '+',
     '-',
@@ -42,10 +42,8 @@ class MyEquationInputState extends State<MyEquationInput> {
     '*',
   ];
 
-  final re = RegExp(r'([-+*])|( )');
-
   void createUIEqn() {
-    List<String> splitString = userInput.split(' ');
+    List<String> splitString = List<String>.from(userInput);
     splitString.asMap().forEach((index, element) {
       if (index == splitString.length - 1) {
         return;
@@ -57,6 +55,7 @@ class MyEquationInputState extends State<MyEquationInput> {
       }
     });
     uiEqn = splitString.join();
+    uiEqn = uiEqn.replaceAll('∸', '-');
     print(uiEqn);
   }
 
@@ -82,7 +81,7 @@ class MyEquationInputState extends State<MyEquationInput> {
                         style: const TextStyle(
                           fontSize: 24,
                         ),
-                        child: CaTeX(userInput == ''
+                        child: CaTeX(userInput == []
                             ? r'\text{ }'
                             : uiEqn + r'\text{ }'),
                       )),
@@ -100,8 +99,7 @@ class MyEquationInputState extends State<MyEquationInput> {
                   return MyButton(
                     buttontapped: () {
                       setState(() {
-                        userInput = '';
-                        answer = '';
+                        userInput = [' '];
                         widget.updateUserEquation(userInput);
                       });
                     },
@@ -116,8 +114,7 @@ class MyEquationInputState extends State<MyEquationInput> {
                   return MyButton(
                     buttontapped: () {
                       setState(() {
-                        userInput += buttons[index];
-                        operatorFlag = true;
+                        userInput.add(buttons[index]);
                         widget.updateUserEquation(userInput);
                       });
                     },
@@ -132,8 +129,11 @@ class MyEquationInputState extends State<MyEquationInput> {
                   return MyButton(
                     buttontapped: () {
                       setState(() {
-                        userInput += ' ${buttons[index]}';
-                        widget.updateUserEquation(userInput);
+                        if (allowX) {
+                          userInput.add(buttons[index]);
+                          widget.updateUserEquation(userInput);
+                          allowX = false;
+                        }
                       });
                     },
                     buttonText: buttons[index],
@@ -146,22 +146,12 @@ class MyEquationInputState extends State<MyEquationInput> {
                   return MyButton(
                     buttontapped: () {
                       setState(() {
-                        if (userInput == '' ||
-                            userInput.length == 1 ||
-                            userInput == 'y=' ||
-                            userInput == 'y= ') {
-                          userInput = '';
-                          widget.updateUserEquation(userInput);
-                          return;
-                        }
-                        if (re.hasMatch(userInput.substring(
-                            userInput.length - 2, userInput.length - 1))) {
-                          userInput =
-                              userInput.substring(0, userInput.length - 2);
-                          widget.updateUserEquation(userInput);
-                        } else {
-                          userInput =
-                              userInput.substring(0, userInput.length - 1);
+                        if (userInput.length > 1) {
+                          if (userInput.last == 'x') {
+                            allowX = true;
+                            widget.updateUserEquation(userInput);
+                          }
+                          userInput.removeLast();
                           widget.updateUserEquation(userInput);
                         }
                       });
@@ -171,23 +161,74 @@ class MyEquationInputState extends State<MyEquationInput> {
                     textColor: Colors.black,
                   );
                 }
+                // + button
+                else if (index == 4) {
+                  return MyButton(
+                    buttontapped: () {
+                      setState(() {
+                        if (!isOperator(userInput.last)) {
+                          userInput.add(buttons[index]);
+                          widget.updateUserEquation(userInput);
+                          allowX = true;
+                        }
+                      });
+                    },
+                    buttonText: buttons[index],
+                    color: Colors.blueAccent,
+                    textColor: Colors.white,
+                  );
+                }
                 // - button
                 else if (index == 5) {
                   return MyButton(
                     buttontapped: () {
-                      if (operatorFlag) {
-                        setState(() {
-                          userInput += buttons[index];
-                          operatorFlag = false;
+                      setState(() {
+                        if (isOperator(userInput.last)) {
+                          userInput.add('∸');
                           widget.updateUserEquation(userInput);
-                        });
-                      } else {
-                        setState(() {
-                          userInput += ' ${buttons[index]} ';
-                          operatorFlag = true;
+                        } else if (userInput.last.split('').last == '∸') {
+                          userInput.last += '∸';
                           widget.updateUserEquation(userInput);
-                        });
-                      }
+                        } else {
+                          userInput.add(buttons[index]);
+                          widget.updateUserEquation(userInput);
+                          allowX = true;
+                        }
+                      });
+                    },
+                    buttonText: buttons[index],
+                    color: Colors.blueAccent,
+                    textColor: Colors.white,
+                  );
+                }
+                // / button
+                else if (index == 11) {
+                  return MyButton(
+                    buttontapped: () {
+                      setState(() {
+                        if (!isOperator(userInput.last)) {
+                          userInput.add(buttons[index]);
+                          widget.updateUserEquation(userInput);
+                          allowX = false;
+                        }
+                      });
+                    },
+                    buttonText: buttons[index],
+                    color: Colors.blueAccent,
+                    textColor: Colors.white,
+                  );
+                }
+                // * button
+                else if (index == 17) {
+                  return MyButton(
+                    buttontapped: () {
+                      setState(() {
+                        if (!isOperator(userInput.last)) {
+                          userInput.add(buttons[index]);
+                          widget.updateUserEquation(userInput);
+                          allowX = false;
+                        }
+                      });
                     },
                     buttonText: buttons[index],
                     color: Colors.blueAccent,
@@ -199,14 +240,13 @@ class MyEquationInputState extends State<MyEquationInput> {
                   return MyButton(
                     buttontapped: () {
                       setState(() {
-                        if (isOperator(buttons[index])) {
-                          userInput += " ${buttons[index]} ";
+                        if (isOperator(userInput.last)) {
+                          userInput.add(buttons[index]);
                           widget.updateUserEquation(userInput);
-                          operatorFlag = true;
                         } else {
-                          userInput += buttons[index];
+                          userInput.last += buttons[index];
                           widget.updateUserEquation(userInput);
-                          operatorFlag = false;
+                          allowX = true;
                         }
                       });
                     },
@@ -226,13 +266,13 @@ class MyEquationInputState extends State<MyEquationInput> {
   }
 
   bool isOperator(String x) {
-    if (x == '-' || x == '+' || x == '/' || x == '*') {
+    if (x == '-' || x == '+' || x == '/' || x == '*' || x == 'y=' || x == ' ') {
       return true;
     }
     return false;
   }
 
-// function to calculate the input operation
+/** function to calculate the input operation
   void equalPressed() {
     String finaluserinput = userInput;
     finaluserinput = userInput.replaceAll('x', '*');
@@ -243,4 +283,5 @@ class MyEquationInputState extends State<MyEquationInput> {
     double eval = exp.evaluate(EvaluationType.REAL, cm);
     answer = eval.toString();
   }
+*/
 }
