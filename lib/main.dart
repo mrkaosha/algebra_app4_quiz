@@ -35,9 +35,10 @@ class _MainAppState extends State<MainApp> {
   double gridSize = 25;
   double margins = 0.05; //the margin size as a percent of canvasWidth
   CalculateSlope params = CalculateSlope();
-  Map<String, dynamic> currentParams = {};
+  Map<String, dynamic> currentParams =
+      {}; //parameters for the current math problem
+
   List<String> _userInput = [];
-  bool drawCursor = false;
   Variable xVar = Variable('x');
   Parser p = Parser();
   late Expression exp;
@@ -92,7 +93,10 @@ class _MainAppState extends State<MainApp> {
   }
 
   void updateUserEquation(List<String> userInput) {
-    setState(() => {_userInput = userInput});
+    setState(() {
+      _userInput = userInput;
+      print('check:'+'('+userInput.join().replaceAll('∸', '-').replaceFirst('y=','')+')');
+    });
   }
 
   void updateUser(String uid, String username) {

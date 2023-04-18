@@ -12,11 +12,11 @@ class ProblemStatement extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    String eqnString = "${currentParams['num']}, ${currentParams['den']}, ${currentParams['x1']}, ${currentParams['y1']}";
+    String eqnString = "Slope: ${currentParams['num']}/${currentParams['den']}, Point: (${currentParams['x1']}, ${currentParams['y1']})";
     return Padding(
       padding: const EdgeInsets.all(20.0),
       child: Text(
-        "Graph $eqnString",
+        "Write the correct equation for\n$eqnString",
         style: const TextStyle(fontSize: 18),
       ),
     );
