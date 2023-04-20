@@ -28,20 +28,17 @@ class MainApp extends StatefulWidget {
 }
 
 class _MainAppState extends State<MainApp> {
-  double x = 0.0;
-  double y = 0.0;
-  double canvasWidth = 500;
-  double canvasHeight = 500;
-  double gridSize = 25;
-  double margins = 0.05; //the margin size as a percent of canvasWidth
   CalculateSlope params = CalculateSlope();
   Map<String, dynamic> currentParams =
       {}; //parameters for the current math problem
 
   List<String> _userInput = [];
   Variable xVar = Variable('x');
+  Variable yVar = Variable('y');
   Parser p = Parser();
   late Expression exp;
+  ContextModel cm = ContextModel();
+  String incorrectMessage = "none";
 
   FirebaseFirestore db = FirebaseFirestore.instance;
   String _uid = "guest";
@@ -50,23 +47,10 @@ class _MainAppState extends State<MainApp> {
   @override
   _MainAppState() {
     currentParams = params.getNextParams();
-    _resetDataList();
     print(currentParams);
   }
 
   List<List<bool>> dataList = [];
-
-  void _resetDataList() {
-    dataList = List.generate(
-      (canvasHeight / gridSize as int) + 1,
-      (i) => List.generate(
-        (canvasWidth / gridSize as int) + 1,
-        (j) => false,
-        growable: false,
-      ),
-      growable: false,
-    );
-  }
 
   void nextEquation() {
     setState(() => currentParams = params.getNextParams());
@@ -74,23 +58,57 @@ class _MainAppState extends State<MainApp> {
   }
 
   bool checkAnswer() {
+    String checkEquation =
+        "${_userInput.join().replaceAll('∸', '-').replaceAll('⋅x', '*x').replaceFirst('=', '-(')})";
+    cm.bindVariable(xVar, Number(currentParams['x1']));
+    cm.bindVariable(yVar, Number(currentParams['y1']));
+    try {
+      exp = p.parse(checkEquation);
+      double eval = exp.evaluate(EvaluationType.REAL, cm);
+      print(eval);
+      if (eval == 0.0) {
+        cm.bindVariable(
+            xVar, Number(currentParams['x1'] + currentParams['den']));
+        cm.bindVariable(
+            yVar, Number(currentParams['y1'] + currentParams['num']));
+        print(exp.evaluate(EvaluationType.REAL, cm) == 0.0);
+        return (exp.evaluate(EvaluationType.REAL, cm) == 0.0);
+      } else {
+        setState(() {
+          incorrectMessage = "none";
+        });
+        return (false);
+      }
+    } catch (e) {
+      print('syntax error');
+      setState(() {
+        incorrectMessage =
+            "The expression you entered is not a standard format";
+      });
+    } finally {
+      db.collection('listtest').get().then(
+        (querySnapshot) {
+          print("Successfully completed");
+          for (var docSnapshot in querySnapshot.docs) {
+            print('${docSnapshot.id} => ${docSnapshot.data()}');
+          }
+        },
+        onError: (e) => print("Error completing: $e"),
+      );
+    }
+/*
     db.collection('listtest').doc(_uid).set({
       "author_uid": _uid,
       "author_name": _username,
       'test': FieldValue.serverTimestamp()
     });
-
-    db.collection('listtest').get().then(
-      (querySnapshot) {
-        print("Successfully completed");
-        for (var docSnapshot in querySnapshot.docs) {
-          print('${docSnapshot.id} => ${docSnapshot.data()}');
-        }
-      },
-      onError: (e) => print("Error completing: $e"),
-    );
+*/
     return false;
   }
+
+String getIncorrectMessage() {
+  return incorrectMessage;
+}
 
   void updateUserEquation(List<String> userInput) {
     setState(() {
@@ -133,6 +151,7 @@ class _MainAppState extends State<MainApp> {
                 checkAnswer: checkAnswer,
                 nextEquation: nextEquation,
                 currentParams: currentParams,
+                getIncorrectMessage: getIncorrectMessage,
               ),
             ),
             const Padding(
