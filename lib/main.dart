@@ -95,7 +95,8 @@ class _MainAppState extends State<MainApp> {
   void updateUserEquation(List<String> userInput) {
     setState(() {
       _userInput = userInput;
-      print('check:'+'('+userInput.join().replaceAll('∸', '-').replaceFirst('y=','')+')');
+      print(
+          'check:${userInput.join().replaceAll('∸', '-').replaceAll('⋅x', '*x').replaceFirst('=', '-(')})');
     });
   }
 

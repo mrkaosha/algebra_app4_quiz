@@ -129,11 +129,10 @@ class MyEquationInputState extends State<MyEquationInput> {
                     buttontapped: () {
                       setState(() {
                         if (allowX) {
-                          userInput.add(
-                            isOperator(userInput.last) || userInput.last == '∸'
-                            ? 'x'
-                            : '⋅x'
-                          );
+                          userInput.add(isOperator(userInput.last) ||
+                                  userInput.last == '∸'
+                              ? 'x'
+                              : '⋅x');
                           widget.updateUserEquation(userInput);
                           allowX = false;
                         }
@@ -151,7 +150,9 @@ class MyEquationInputState extends State<MyEquationInput> {
                       setState(() {
                         if (userInput.length > 1) {
                           userInput.removeLast();
-                          allowX = checkForAllowX(userInput.length - 1);
+                          allowX = userInput.last == '/'
+                              ? false
+                              : checkForAllowX(userInput.length - 1);
                           widget.updateUserEquation(userInput);
                         }
                       });
@@ -244,6 +245,8 @@ class MyEquationInputState extends State<MyEquationInput> {
                           userInput.add(buttons[index]);
                           widget.updateUserEquation(userInput);
                           allowX = checkForAllowX(userInput.length - 1);
+                        } else if (userInput.last == 'x' ||
+                            userInput.last == '⋅x') {
                         } else {
                           userInput.last += buttons[index];
                           widget.updateUserEquation(userInput);
@@ -274,14 +277,17 @@ class MyEquationInputState extends State<MyEquationInput> {
   }
 
   bool checkForAllowX(int i) {
-    if(i <= 0 || userInput[i] == 'y=' || userInput[i] == '+' || userInput[i] == '-') {
+    if (i <= 0 ||
+        userInput[i] == 'y=' ||
+        userInput[i] == '+' ||
+        userInput[i] == '-') {
       return true;
-    } else if(userInput[i] == '*') {
-      return (true && checkForAllowX(i-1));
-    } else if(userInput[i] == 'x' || userInput[i] == '⋅x') {
+    } else if (userInput[i] == '*') {
+      return (true && checkForAllowX(i - 1));
+    } else if (userInput[i] == 'x' || userInput[i] == '⋅x') {
       return false;
     } else {
-      return checkForAllowX(i-1);
+      return checkForAllowX(i - 1);
     }
   }
 
