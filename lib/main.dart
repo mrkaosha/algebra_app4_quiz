@@ -58,6 +58,7 @@ class _MainAppState extends State<MainApp> {
   }
 
   bool checkAnswer() {
+    bool correct = false;
     String checkEquation =
         "${_userInput.join().replaceAll('∸', '-').replaceAll('⋅x', '*x').replaceFirst('=', '-(')})";
     cm.bindVariable(xVar, Number(currentParams['x1']));
@@ -72,12 +73,13 @@ class _MainAppState extends State<MainApp> {
         cm.bindVariable(
             yVar, Number(currentParams['y1'] + currentParams['num']));
         print(exp.evaluate(EvaluationType.REAL, cm) == 0.0);
-        return (exp.evaluate(EvaluationType.REAL, cm) == 0.0);
+        correct = exp.evaluate(EvaluationType.REAL, cm) == 0.0;
+        return (correct);
       } else {
         setState(() {
           incorrectMessage = "none";
         });
-        return (false);
+        return (correct);
       }
     } catch (e) {
       print('syntax error');
@@ -86,15 +88,32 @@ class _MainAppState extends State<MainApp> {
             "The expression you entered is not a standard format";
       });
     } finally {
-      db.collection('listtest').get().then(
-        (querySnapshot) {
-          print("Successfully completed");
-          for (var docSnapshot in querySnapshot.docs) {
-            print('${docSnapshot.id} => ${docSnapshot.data()}');
-          }
-        },
-        onError: (e) => print("Error completing: $e"),
-      );
+      DocumentReference prevAnswer =
+          db.collection(_username).doc(currentParams.toString());
+      prevAnswer.get().then((d) => {
+            if (d.exists)
+              {
+                prevAnswer.update({
+                  "author_uid": _uid,
+                  "author_name": _username,
+                  'response': _userInput.join(),
+                  'correct': correct,
+                  'time': FieldValue.serverTimestamp(),
+                  'attempts': FieldValue.increment(1)
+                })
+              }
+            else
+              {
+                prevAnswer.set({
+                  "author_uid": _uid,
+                  "author_name": _username,
+                  'response': _userInput.join(),
+                  'correct': correct,
+                  'time': FieldValue.serverTimestamp(),
+                  'attempts': 1
+                })
+              }
+          });
     }
 /*
     db.collection('listtest').doc(_uid).set({
@@ -103,12 +122,12 @@ class _MainAppState extends State<MainApp> {
       'test': FieldValue.serverTimestamp()
     });
 */
-    return false;
+    return correct;
   }
 
-String getIncorrectMessage() {
-  return incorrectMessage;
-}
+  String getIncorrectMessage() {
+    return incorrectMessage;
+  }
 
   void updateUserEquation(List<String> userInput) {
     setState(() {
