@@ -97,7 +97,7 @@ class _MainAppState extends State<MainApp> {
                   "author_uid": _uid,
                   "author_name": _username,
                   'response': _userInput.join(),
-                  'correct': correct,
+                  'correct': FieldValue.increment(correct ? 1 : 0),
                   'time': FieldValue.serverTimestamp(),
                   'attempts': FieldValue.increment(1)
                 })
@@ -108,7 +108,7 @@ class _MainAppState extends State<MainApp> {
                   "author_uid": _uid,
                   "author_name": _username,
                   'response': _userInput.join(),
-                  'correct': correct,
+                  'correct': correct ? 1 : 0,
                   'time': FieldValue.serverTimestamp(),
                   'attempts': 1
                 })
@@ -158,6 +158,23 @@ class _MainAppState extends State<MainApp> {
               child: LoginButton(
                 updateUid: updateUser,
               ),
+            ),
+            Align(
+              child: _uid == "guest"
+                  ? Container(
+                      color: Colors.blueGrey,
+                      child: const Padding(
+                        padding: EdgeInsets.all(12),
+                        child: Text(
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                            fontSize: 24,
+                          ),
+                          "Please Log In To Save Results!",
+                        ),
+                      ))
+                  : const SizedBox(),
             ),
             Align(
               child: ProblemStatement(currentParams: currentParams),
@@ -254,6 +271,7 @@ class _LoginButtonState extends State<LoginButton> {
                 TextButton(
                   onPressed: () => setState(() {
                     loggedIn = false;
+                    widget.updateUid('guest', "Guest");
                     FirebaseAuth.instance.signOut;
                   }),
                   child: const Text('Log Out'),
