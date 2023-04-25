@@ -100,6 +100,7 @@ class MyEquationInputState extends State<MyEquationInput> {
                       setState(() {
                         userInput = [' '];
                         widget.updateUserEquation(userInput);
+                        allowX = true;
                       });
                     },
                     buttonText: buttons[index],
