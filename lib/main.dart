@@ -12,6 +12,8 @@ import 'package:math_expressions/math_expressions.dart';
 //import 'grid_with_gestures.dart';
 //import 'calculator.dart';
 
+/* TODO: Add calculator button, add history button */
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(

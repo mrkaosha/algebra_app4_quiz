@@ -30,6 +30,7 @@ class _ActionButtonsState extends State<ActionButtons> {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
+        //Check Answer Button
         TextButton(
           onPressed: () {
             if (widget.answerChecked) return;
@@ -62,6 +63,7 @@ class _ActionButtonsState extends State<ActionButtons> {
           },
           child: const Text("Check Answer"),
         ),
+        // Next Question Button
         TextButton(
           onPressed: () {
             widget.nextEquation();
