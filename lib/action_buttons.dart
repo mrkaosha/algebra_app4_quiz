@@ -7,7 +7,10 @@ class ActionButtons extends StatefulWidget {
   final dynamic nextEquation;
   final dynamic currentParams;
   final dynamic getIncorrectMessage;
-  const ActionButtons(
+
+  bool answerChecked = false;
+
+  ActionButtons(
       {required this.checkAnswer,
       required this.nextEquation,
       required this.currentParams,
@@ -27,10 +30,16 @@ class _ActionButtonsState extends State<ActionButtons> {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
+        //Check Answer Button
         TextButton(
           onPressed: () {
+            if (widget.answerChecked) return;
+
             setState(() {
               correct = widget.checkAnswer();
+              if (correct) {
+                widget.answerChecked = true;
+              }
               incorrectMessage = widget.getIncorrectMessage();
               if (incorrectMessage == "none") {
                 message =
@@ -54,9 +63,13 @@ class _ActionButtonsState extends State<ActionButtons> {
           },
           child: const Text("Check Answer"),
         ),
+        // Next Question Button
         TextButton(
           onPressed: () {
             widget.nextEquation();
+            setState(() {
+              widget.answerChecked = false;
+            });
           },
           child: const Text("Next Equation"),
         ),
